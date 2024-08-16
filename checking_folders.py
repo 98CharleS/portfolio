@@ -4,9 +4,8 @@ import csv
 import concurrent.futures
 
 
-def getting_folder_mod_time(*args):  # retuning date of modification as string
+def getting_folder_mod_time(x):  # retuning date of modification as string
     print("Updating")
-    x = args[0]
     try:  # checking if it is possible to access the location of X
         y = os.stat(x).st_mtime
         mod_date = datetime.fromtimestamp(y)
@@ -16,14 +15,16 @@ def getting_folder_mod_time(*args):  # retuning date of modification as string
         print("Program stopped manually")
     except FileNotFoundError:
         print(f"Can't find the file {x}")
+        return ("Couldn't find the file") 
     except ValueError:
         print("Missing localization")
+        return ("Missing localization path")
 
 
-def run_with_timeout(func, args=(), kwargs={}, timeout_duration=5):
+def run_with_timeout(func, args=[], kwargs={}, timeout_duration=5):
     # use to timeout if connection to folder takes too long (checking folders located in backup server)
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        future = executor.submit(func, *args, **kwargs)
+        future = executor.submit(func, args, **kwargs)
         try:
             result = future.result(timeout=timeout_duration)
             return result
@@ -63,10 +64,10 @@ def writing_file(x):
     f.close()
 
 
-def main(f_input):
+def main():
     folders = []
     print("Opening data")
-    with open(f_input) as file:  # opening a spreadsheet with folders localizations
+    with open("folders_date.csv") as file:  # opening a spreadsheet with folders localizations
         reader = csv.reader(file)
         for row in reader:
             folders.append(row[0])
@@ -75,4 +76,4 @@ def main(f_input):
 
 
 if __name__ == '__main__':
-    main("folders_date.csv")
+    main()
